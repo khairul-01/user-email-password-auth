@@ -1,4 +1,4 @@
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from "firebase/auth";
 import auth from "../firebase/firebase.config";
 import { useState } from "react";
 import { AiFillEyeInvisible, AiFillEye } from 'react-icons/ai'
@@ -12,10 +12,11 @@ const Register = () => {
 
    const handleSubmit = e => {
       e.preventDefault();
+      const name = e.target.name.value;
       const email = e.target.email.value;
       const password = e.target.password.value;
       const check = e.target.terms.checked;
-      console.log(email, password, check);
+      console.log(name, email, password, check);
 
       setRegisterError('');
       setRegisterSuccess('');
@@ -36,6 +37,21 @@ const Register = () => {
          .then(result => {
             console.log(result.user);
             setRegisterSuccess('User created Successfully');
+
+            // Update profile
+            updateProfile(result.user, {
+               displayName: name,
+               photoURL: "https://example.com/jane-q-user/profile.jpg"
+            })
+               .then(() => {
+                  console.log('profile updated successfully')
+               })
+               .catch(error => console.log(error.message))
+            // send verification email
+            sendEmailVerification(result.user)
+               .then(() => {
+                  alert('Please check your email and verify your account ')
+               })
          })
          .catch(error => {
             console.error(error);
@@ -47,6 +63,7 @@ const Register = () => {
          <div className="w-1/2 mx-auto">
             <form onSubmit={handleSubmit}>
                <h1 className="text-3xl mb-4">Please Register</h1>
+               <input className="w-3/5 border-2 rounded-md px-4 py-2 mb-4" type="text" name="name" id="" placeholder="Your Name" required /> <br />
                <input className="w-3/5 border-2 rounded-md px-4 py-2 mb-4" type="email" name="email" id="" placeholder="Email Address" required /> <br />
                <div className="flex items-center mb-4 relative w-3/5 ">
                   <input

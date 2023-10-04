@@ -33,7 +33,12 @@ const Login = () => {
       signInWithEmailAndPassword(auth, email, password)
          .then(result => {
             console.log(result.user);
-            setRegisterSuccess('User created Successfully');
+            if(result.user.emailVerified){
+               setRegisterSuccess('User Logged In successfully')
+            }
+            else{
+               alert('Please verify your email address.')
+            }
          })
          .catch(error => {
             console.error(error);
